@@ -119,19 +119,20 @@ processed_X_val =  preprocess_data(X_val)
 processed_X_test = preprocess_data(X_test)
 
 inputs = tf.keras.Input(shape=(34,))
-# Reshape the input to treat the 17 landmarks as a sequence for the attention layer
-x = keras.layers.Reshape((17, 2))(inputs)
-# Apply multi-head attention to capture relationships between different body parts
-attention_output = keras.layers.MultiHeadAttention(num_heads=4, key_dim=16)(x, x)
-x = keras.layers.Add()([x, attention_output])
-x = keras.layers.LayerNormalization()(x)
-x = keras.layers.Flatten()(x)
-x = keras.layers.Dense(128, activation='swish')(x)
+
+# Advanced modern dense architecture using TFJS compatible layers
+x = keras.layers.Dense(256, activation='relu')(inputs)
 x = keras.layers.BatchNormalization()(x)
-x = keras.layers.Dropout(0.5)(x)
-x = keras.layers.Dense(64, activation='swish')(x)
+x = keras.layers.Dropout(0.4)(x)
+
+x = keras.layers.Dense(128, activation='relu')(x)
 x = keras.layers.BatchNormalization()(x)
-x = keras.layers.Dropout(0.5)(x)
+x = keras.layers.Dropout(0.4)(x)
+
+x = keras.layers.Dense(64, activation='relu')(x)
+x = keras.layers.BatchNormalization()(x)
+x = keras.layers.Dropout(0.4)(x)
+
 outputs = keras.layers.Dense(len(class_names), activation="softmax")(x)
 
 model = keras.Model(inputs, outputs)
