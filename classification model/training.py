@@ -118,12 +118,21 @@ processed_X_train = preprocess_data(X_train)
 processed_X_val =  preprocess_data(X_val)
 processed_X_test = preprocess_data(X_test)
 
-inputs = tf.keras.Input(shape=(34))
-layer = keras.layers.Dense(128, activation=tf.nn.relu6)(inputs)
-layer = keras.layers.Dropout(0.5)(layer)
-layer = keras.layers.Dense(64, activation=tf.nn.relu6)(layer)
-layer = keras.layers.Dropout(0.5)(layer)
-outputs = keras.layers.Dense(len(class_names), activation="softmax")(layer)
+inputs = tf.keras.Input(shape=(34,))
+# Reshape the input to treat the 17 landmarks as a sequence for the attention layer
+x = keras.layers.Reshape((17, 2))(inputs)
+# Apply multi-head attention to capture relationships between different body parts
+attention_output = keras.layers.MultiHeadAttention(num_heads=4, key_dim=16)(x, x)
+x = keras.layers.Add()([x, attention_output])
+x = keras.layers.LayerNormalization()(x)
+x = keras.layers.Flatten()(x)
+x = keras.layers.Dense(128, activation='swish')(x)
+x = keras.layers.BatchNormalization()(x)
+x = keras.layers.Dropout(0.5)(x)
+x = keras.layers.Dense(64, activation='swish')(x)
+x = keras.layers.BatchNormalization()(x)
+x = keras.layers.Dropout(0.5)(x)
+outputs = keras.layers.Dense(len(class_names), activation="softmax")(x)
 
 model = keras.Model(inputs, outputs)
 
@@ -136,7 +145,7 @@ model.compile(
 
 # Add a checkpoint callback to store the checkpoint that has the highest
 # validation accuracy.
-checkpoint_path = "weights.best.hdf5"
+checkpoint_path = "weights.best.keras"
 checkpoint = keras.callbacks.ModelCheckpoint(checkpoint_path,
                              monitor='val_accuracy',
                              verbose=1,
