@@ -123,4 +123,3 @@ To retrain the neural network with new data or hyperparameter tuning:
 ## References
 
 For visual demonstrations of the system's capabilities, please refer to the following demonstration video:
-* [Project Demonstration and Explanation](https://www.youtube.com/watch?v=fiDaAc7z_kQ)
