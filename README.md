@@ -120,6 +120,3 @@ To retrain the neural network with new data or hyperparameter tuning:
 | **Test Accuracy** | 97.26% |
 | **Inference Time** | < 25ms (Device dependent) |
 
-## References
-
-For visual demonstrations of the system's capabilities, please refer to the following demonstration video:
